@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'blebot' => [
+        'token' => env('BLEBOT_TOKEN'),
+    ],
+
 ];

@@ -6,8 +6,11 @@ use App\Http\Controllers\V1\ProjectController;
 use App\Http\Controllers\V1\RoleController;
 use App\Http\Controllers\V1\TaskController;
 use App\Http\Controllers\V1\UserController;
+use App\Http\Controllers\V1\BleBotController;
 
 use Illuminate\Support\Facades\Route;
+
+Route::post('v1/blebot/webhook', [BleBotController::class, 'handle']);
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->middleware('guest');;
