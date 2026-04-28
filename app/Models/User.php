@@ -55,7 +55,6 @@ class User extends Authenticatable
     public function hasRole($role)
     {
         return $this->roles()->where('name', $role)->exists();
-
     }
 
     public function assignRole($role)
@@ -63,11 +62,9 @@ class User extends Authenticatable
         if (is_string($role)) {
 
             $role = Role::where('name', $role)->firstOrFail()->id;
-
         } elseif ($role instanceof Role) {
 
             $role = $role->id;
-
         }
 
         return $this->roles()->syncWithoutDetaching([$role]);
@@ -78,11 +75,9 @@ class User extends Authenticatable
         if (is_string($role)) {
 
             $role = Role::where('name', $role)->firstOrFail()->id;
-
         } elseif ($role instanceof Role) {
 
             $role = $role->id;
-
         }
 
         return $this->roles()->detach($role);
@@ -100,7 +95,7 @@ class User extends Authenticatable
 
     public function projects()
     {
-        return $this->hasMany(Project::class);
+        return $this->hasMany(Project::class, 'owner_id');
     }
 
     public function assignedTasks()
@@ -115,8 +110,6 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->roles()->where('name', 'admin')->exists();//note2:admin should be enum
+        return $this->roles()->where('name', 'admin')->exists(); //note2:admin should be enum
     }
-
-
 }

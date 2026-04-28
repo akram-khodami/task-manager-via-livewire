@@ -18,17 +18,22 @@ class Task extends Model
         'due_date',
         'priority',
         'folder_id',
+        'project_id',
         'created_by',
-        'assigned_to'
+        'assigned_to',
+        'estimated_hours',
+        'spent_hours',
     ];
 
     protected $casts = [
         'due_date' => 'datetime',
+        'estimated_hours' => 'decimal:2',
+        'spent_hours' => 'decimal:2',
     ];
 
     public function project()
     {
-        return $this->belongsTo(Project::class, 'project_id', 'id', 'folder');
+        return $this->belongsTo(Project::class);
     }
 
     public function folder()
@@ -54,11 +59,23 @@ class Task extends Model
     //use Accessor for access to $task->status_title
     public function getStatusTitleAttribute()
     {
-        return TaskStatus::from($this->status)->label();
+//        return TaskStatus::from($this->status)->label();
     }
 
     public function getPriorityTitleAttribute()
     {
-        return TaskPriority::from($this->priority)->label();
+//        return TaskPriority::from($this->priority)->label();
     }
+
+
+    public function getStatusColorAttribute()
+    {
+        return match($this->status){
+        'todo' => 'warning',
+        'in_progress' => 'info',
+        'done' => 'success',
+        'cancelled' => 'danger',
+        default => 'secondary'
+    };
+}
 }

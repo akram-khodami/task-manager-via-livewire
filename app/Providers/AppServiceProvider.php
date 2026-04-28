@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Events\AssignedTask;
 use App\Listeners\NotifyAssignedTask;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,5 +24,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Event::listen(AssignedTask::class, NotifyAssignedTask::class);
+
+        // Paginator::useBootstrap();
+        Paginator::useBootstrapFive();
     }
 }

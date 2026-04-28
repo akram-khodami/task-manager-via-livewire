@@ -40,7 +40,7 @@ class Project extends Model
 
     public function tasks()
     {
-        return $this->hasManyThrough(Task::class, Folder::class);
+        return $this->hasMany(Task::class);
     }
 
     /**
