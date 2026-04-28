@@ -307,4 +307,35 @@ class Tasks extends Component
             ->latest() // Fallback sort
             ->paginate(10);
     }
+
+    public function resetFilters(): void
+    {
+        $this->reset(['search', 'statusFilter', 'filterByProjectId', 'filterByUserId']);
+        $this->resetPage();
+    }
+
+    #[Computed]
+    public function isEmbedded(): bool
+    {
+        return !is_null($this->projectId);
+    }
+
+    #[Computed]
+    public function backToProjectUrl(): ?string
+    {
+        if ($this->filterByProjectId) {
+            return url('projects/' . $this->filterByProjectId);
+        }
+        return null;
+    }
+
+    #[Computed]
+    public function backToFolderUrl(): ?string
+    {
+        if ($this->filterByFolderId) {
+            return url('folders/' . $this->filterByFolderId);
+        }
+        return null;
+    }
+
 }

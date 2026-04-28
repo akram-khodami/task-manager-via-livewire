@@ -43,10 +43,6 @@
             transition: background-color 0.2s;
         }
 
-        .modal-header .btn-close {
-            margin: 0;
-        }
-
         [dir="rtl"] .modal-header .btn-close {
             margin-left: 0 !important;
             margin-right: auto !important;

@@ -197,5 +197,9 @@ return [
     'view' => 'مشاهده',
     'view_task' => 'مشاهده تسک',
     'sort_by' => 'مرتب‌سازی بر اساس',
-
+    'clear_filters' => 'حذف فیلترها',
+    'filters' => 'فیلترها',
+    'back_to_project' => 'بازگشت به پروژه',
+    'back_to_folder' => 'بازگشت به پوشه',
+    'fullscreen' => 'نمایش تمام صفحه',
 ];

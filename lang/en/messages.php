@@ -197,5 +197,10 @@ return [
     'view' => 'View',
     'view_task' => 'View Task',
     'sort_by' => 'Sort By',
+    'clear_filters' => 'Clear filters',
+    'filters' => 'Filters',
+    'back_to_project' => 'Back to project',
+    'back_to_folder' => 'Back to the Folder',
+    'fullscreen' => 'Fullscreen',
 
 ];

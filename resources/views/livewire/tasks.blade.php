@@ -4,8 +4,37 @@
             <div class="col-12">
                 <div class="card shadow-lg border-1 border-light-subtle mb-4">
 
-                    <div class="card-header text-bg-primary">
+                    <div class="card-header text-bg-primary d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">{{ __('messages.task_page_title') }}</h5>
+
+                        <div class="d-flex gap-2">
+
+                            @if($this->isEmbedded)
+                                <a href="{{ url('tasks?projectId='.$projectId) }}"
+                                   class="btn btn-primary btn-sm"
+                                   target="_blank"
+                                   title="{{ __('messages.fullscreen') }}">
+                                    ⛶
+                                </a>
+                            @else
+                                @if($this->filterByProjectId && $this->backToProjectUrl)
+                                    <a href="{{ $this->backToProjectUrl }}"
+                                       class="btn btn-primary btn-sm"
+                                       wire:navigate>
+                                        ← {{ __('messages.back_to_project') }}
+                                    </a>
+                                @endif
+
+                                @if($this->filterByFolderId && $this->backToFolderUrl)
+                                    <a href="{{ $this->backToFolderUrl }}"
+                                       class="btn btn-primary btn-sm"
+                                       wire:navigate>
+                                        ← {{ __('messages.back_to_folder') }}
+                                    </a>
+                                @endif
+
+                            @endif
+                        </div>
                     </div>
 
                     {{-- Filters --}}
@@ -50,13 +79,16 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-3 d-flex justify-content-between align-items-center">
-                                    {{--                                    <a href="{{ url('tasks?projectId='.$projectId) }}"--}}
-                                    {{--                                       class="btn btn-outline-secondary btn-sm {{ !isset($projectId) ? 'disabled' : '' }}"--}}
-                                    {{--                                       title="{{ __('messages.view_task') }}">--}}
-                                    {{--                                        👁️ {{ __('messages.view') }}--}}
-                                    {{--                                    </a>--}}
-                                    <button wire:click="create()" class="btn btn-primary btn-sm">
+                                <div class="col-md-3 d-flex gap-2 align-items-center">
+                                    @if($search || $statusFilter || $filterByProjectId || $filterByUserId)
+                                        <button wire:click="resetFilters"
+                                                class="btn btn-outline-danger btn-sm"
+                                                title="{{ __('messages.clear_filters') }}">
+                                            ✖ {{ __('messages.filters') }}
+                                        </button>
+                                    @endif
+
+                                    <button wire:click="create()" class="btn btn-primary btn-sm ms-auto">
                                         ➕ {{ __('messages.new_task') }}
                                     </button>
                                 </div>
@@ -200,16 +232,18 @@
     </div>
 
     {{-- Modal --}}
-    <div wire:ignore.self class="modal fade" id="taskModal" tabindex="-1">
+    <div wire:ignore.self class="modal fade" id="taskModal" tabindex="-1"
+         dir="{{ app()->isLocale('fa') ? 'rtl' : 'ltr' }}">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">
+                    <h5 class="modal-title {{ app()->isLocale('fa') ? 'ms-auto' : '' }}">
                         {{ $taskId ? __('messages.edit_task') : __('messages.new_task') }}
                     </h5>
                     <button type="button"
-                            class="btn-close btn-close-white {{ app()->isLocale('fa') ? 'me-auto ms-0' : '' }}"
-                            wire:click="closeModal"></button>
+                            class="btn-close btn-close-white {{ app()->isLocale('fa') ? 'me-0' : '' }}"
+                            wire:click="closeModal"
+                            aria-label="Close"></button>
                 </div>
 
                 <form wire:submit="save">
