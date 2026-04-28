@@ -121,7 +121,9 @@
                     📂 {{ __('messages.all_folders') }}
                 @endif
             </h5>
-            <div class="btn-group">
+            <div
+                class="btn-group btn-group-sm {{ app()->isLocale('fa') ? 'btn-group-reverse' : '' }}"
+                role="group">
                 <button class="btn btn-outline-secondary {{ $viewMode === 'grid' ? 'active' : '' }}"
                         wire:click="$set('viewMode', 'grid')">
                     📄 ↕
@@ -172,7 +174,9 @@
                                         </div>
 
                                         <div class="folder-actions">
-                                            <div class="btn-group btn-group-sm w-100">
+                                            <div
+                                                class="btn-group btn-group-sm {{ app()->isLocale('fa') ? 'btn-group-reverse' : '' }} w-100"
+                                                role="group">
                                                 <button class="btn btn-outline-primary"
                                                         wire:click="enterFolder({{ $folder->id }})"
                                                         title="{{ __('messages.open') }}">
@@ -189,7 +193,8 @@
                                                     ✏
                                                 </button>
                                                 <button class="btn btn-outline-danger"
-                                                        wire:click="promptDelete({{ $folder->id }})"
+                                                        wire:click="deleteConfirmed({{ $folder->id }})"
+                                                        wire:confirm="{{ __('messages.confirm_delete') }}"
                                                         title="{{ __('messages.delete') }}">
                                                     🗑️
                                                 </button>
@@ -238,7 +243,9 @@
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        <div class="btn-group">
+                                        <div
+                                            class="btn-group btn-group-sm {{ app()->isLocale('fa') ? 'btn-group-reverse' : '' }}"
+                                            role="group">
                                             <button class="btn btn-sm btn-outline-primary"
                                                     wire:click="enterFolder({{ $folder->id }})"
                                                     title="{{ __('messages.open') }}">
@@ -254,10 +261,11 @@
                                                     title="{{ __('messages.edit') }}">
                                                 ✏
                                             </button>
-                                            <button class="btn btn-sm btn-outline-danger"
-                                                    wire:click="promptDelete({{ $folder->id }})"
+                                            <button class="btn btn-outline-danger"
+                                                    wire:click="deleteConfirmed({{ $folder->id }})"
+                                                    wire:confirm="{{ __('messages.confirm_delete') }}"
                                                     title="{{ __('messages.delete') }}">
-                                                ️ 🗑️
+                                                🗑️
                                             </button>
                                         </div>
                                     </div>
@@ -439,40 +447,28 @@
 
     @script
     <script>
-        // Modal Controls
-        $wire.on('open-modal', () => {
-            const modal = new bootstrap.Modal(document.getElementById('folderModal'));
-            modal.show();
-        });
+        let modalInstance = null;
 
-        $wire.on('close-modal', () => {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('folderModal'));
-            if (modal) modal.hide();
-        });
+        $wire.on('open-folder-modal', () => {
+            if (modalInstance) modalInstance.hide();
 
-        // Delete Confirmation
-        $wire.on('confirm-delete', (data) => {
-            Swal.fire({
-                title: '{{ __("messages.are_you_sure") }}',
-                text: '{{ __("messages.folder_delete_warning") }}',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: '{{ __("messages.yes_delete") }}',
-                cancelButtonText: '{{ __("messages.cancel") }}'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $wire.dispatch('deleteConfirmed', {id: data.id});
-                }
+            modalInstance = new bootstrap.Modal(document.getElementById('folderModal'), {
+                backdrop: 'static',
+                keyboard: false
             });
+            modalInstance.show();
         });
 
-        // ESC key to close modal
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                $wire.dispatch('close-modal');
+        $wire.on('close-folder-modal', () => {
+            if (modalInstance) {
+                modalInstance.hide();
+                modalInstance = null;
             }
+        });
+
+        document.getElementById('folderModal')?.addEventListener('hidden.bs.modal', () => {
+            modalInstance = null;
+            $wire.resetForm();
         });
     </script>
     @endscript

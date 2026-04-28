@@ -1,5 +1,4 @@
 <div>
-
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-12">
@@ -21,11 +20,11 @@
 
                         <div class="table-responsive">
                             <div class="row g-3 mb-3">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <input type="text" wire:model.live.debounce.300ms="search"
                                            class="form-control" placeholder=" 🔍 {{__('messages.search_task')}}">
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-2">
                                     <select wire:model.live="statusFilter" class="form-select">
                                         <option value="">{{__('messages.all_status')}}</option>
                                         <option value="todo">{{__('messages.todo')}}</option>
@@ -34,12 +33,32 @@
                                         <option value="cancelled">{{__('messages.cancelled')}}</option>
                                     </select>
                                 </div>
-                                <div class="d-lg-flex">
-                                    <div class="col-md-4 d-flex justify-content-between align-items-center">
-                                        <button wire:click="create()" class="btn btn-primary btn-sm">
-                                            ➕ {{ __('messages.new_task') }}
-                                        </button>
-                                    </div>
+
+                                <div class="col-md-2">
+                                    <select wire:model.live="filterByProjectId" class="form-select">
+                                        <option value="">{{__('messages.all_projects')}}</option>
+                                        @foreach($this->projects as $project)
+                                            <option value="{{ $project->id }}">{{ $project->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select wire:model.live="filterByUserId" class="form-select">
+                                        <option value="">{{__('messages.all_users')}}</option>
+                                        @foreach($this->allUsers as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3 d-flex justify-content-between align-items-center">
+                                    {{--                                    <a href="{{ url('tasks?projectId='.$projectId) }}"--}}
+                                    {{--                                       class="btn btn-outline-secondary btn-sm {{ !isset($projectId) ? 'disabled' : '' }}"--}}
+                                    {{--                                       title="{{ __('messages.view_task') }}">--}}
+                                    {{--                                        👁️ {{ __('messages.view') }}--}}
+                                    {{--                                    </a>--}}
+                                    <button wire:click="create()" class="btn btn-primary btn-sm">
+                                        ➕ {{ __('messages.new_task') }}
+                                    </button>
                                 </div>
                             </div>
 
@@ -47,14 +66,30 @@
                                 <table class="table align-middle mb-1 table-hover table-bordered">
                                     <thead>
                                     <tr>
-                                        <th>#</th>
-                                        <th>{{__('messages.title')}}</th>
-                                        <th>{{__('messages.project_name')}}</th>
-                                        <th>📁{{__('messages.folder')}}</th>
-                                        <th>{{__('messages.status')}}</th>
-                                        <th>{{__('messages.assigned')}}</th>
-                                        <th>{{__('messages.due_date')}}</th>
-                                        <th>{{__('messages.hours')}}</th>
+                                        <th style="cursor: pointer;" wire:click="sortBy('id')">
+                                            # {!! $this->getSortIcon('id') !!}
+                                        </th>
+                                        <th style="cursor: pointer;" wire:click="sortBy('title')">
+                                            {{__('messages.title')}} {!! $this->getSortIcon('title') !!}
+                                        </th>
+                                        <th style="cursor: pointer;" wire:click="sortBy('project_id')">
+                                            {{__('messages.project_name')}} {!! $this->getSortIcon('project_id') !!}
+                                        </th>
+                                        <th style="cursor: pointer;" wire:click="sortBy('folder_id')">
+                                            📁{{__('messages.folder')}} {!! $this->getSortIcon('folder_id') !!}
+                                        </th>
+                                        <th style="cursor: pointer;" wire:click="sortBy('status')">
+                                            {{__('messages.status')}} {!! $this->getSortIcon('status') !!}
+                                        </th>
+                                        <th style="cursor: pointer;" wire:click="sortBy('assigned_to')">
+                                            {{__('messages.assigned')}} {!! $this->getSortIcon('assigned_to') !!}
+                                        </th>
+                                        <th style="cursor: pointer;" wire:click="sortBy('due_date')">
+                                            {{__('messages.due_date')}} {!! $this->getSortIcon('due_date') !!}
+                                        </th>
+                                        <th style="cursor: pointer;" wire:click="sortBy('estimated_hours')">
+                                            {{__('messages.hours')}} {!! $this->getSortIcon('estimated_hours') !!}
+                                        </th>
                                         <th>{{__('messages.actions')}}</th>
                                     </tr>
                                     </thead>
@@ -66,7 +101,12 @@
                                                 <div class="d-flex px-2">
                                                     <div>
                                                         <div class="my-auto">
-                                                            <h6 class="mb-0 text-sm">{{$task->title}}</h6>
+                                                            <h6 class="mb-0 text-sm">
+                                                                <a href="{{ url('tasks/'.$task->id) }}" wire:navigate
+                                                                   class="text-decoration-none">
+                                                                    {{$task->title}}
+                                                                </a>
+                                                            </h6>
                                                             <p class="text-xs text-secondary mb-0">{{$task->description}}</p>
                                                         </div>
                                                     </div>
@@ -74,7 +114,7 @@
                                             </td>
                                             <td>
                                                 <a href="{{url('projects/'.$task->project_id)}}" wire:navigate>
-                                                    {{$task->project->name}}
+                                                    {{$task?->project?->name}}
                                                 </a>
                                             </td>
                                             <td>
@@ -107,7 +147,9 @@
                                                 </div>
                                             </td>
                                             <td class="align-middle">
-                                                <div class="btn-group btn-group-sm" role="group">
+                                                <div
+                                                    class="btn-group btn-group-sm {{ app()->isLocale('fa') ? 'btn-group-reverse' : '' }}"
+                                                    role="group">
                                                     <button wire:click="updateStatus({{$task->id}}, 'todo')"
                                                             class="btn btn-outline-warning btn-sm"
                                                             title="{{__('messages.todo')}}"> ▶
@@ -120,13 +162,19 @@
                                                             class="btn btn-outline-success btn-sm"
                                                             title="{{__('messages.done')}}"> ✅
                                                     </button>
+                                                    <a href="{{ url('tasks/'.$task->id) }}"
+                                                       class="btn btn-outline-secondary btn-sm"
+                                                       title="{{__('messages.view')}}"> 👁️
+                                                    </a>
                                                     <button wire:click="edit({{$task->id}})"
                                                             class="btn btn-outline-primary btn-sm"
                                                             title="{{__('messages.edit')}}"> ✏
                                                     </button>
-                                                    <button wire:click.prevent="promptDelete({{ $task->id }})"
-                                                            class="btn btn-outline-danger btn-sm"
-                                                            title="{{ __('messages.delete') }}"> 🗑️
+                                                    <button class="btn btn-sm btn-outline-danger"
+                                                            wire:click="deleteConfirmed({{ $task->id }})"
+                                                            wire:confirm="{{ __('messages.confirm_delete') }}"
+                                                            title="{{ __('messages.delete') }}">
+                                                        🗑️
                                                     </button>
                                                 </div>
                                             </td>
@@ -159,7 +207,9 @@
                     <h5 class="modal-title">
                         {{ $taskId ? __('messages.edit_task') : __('messages.new_task') }}
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" wire:click="closeModal"></button>
+                    <button type="button"
+                            class="btn-close btn-close-white {{ app()->isLocale('fa') ? 'me-auto ms-0' : '' }}"
+                            wire:click="closeModal"></button>
                 </div>
 
                 <form wire:submit="save">
@@ -196,7 +246,7 @@
                                 <label class="form-label">
                                     {{ __('messages.project_name') }} <span class="text-danger">*</span>
                                 </label>
-                                <select wire:model="projectId"
+                                <select wire:model.live="projectId"
                                         {{ $filterByProjectId && !$taskId ? 'disabled' : '' }}
                                         class="form-select @error('projectId') is-invalid @enderror">
                                     <option value="">{{ __('messages.select') }}</option>
@@ -291,7 +341,7 @@
                         </div>
                     </div>
 
-                    <div class="modal-footer">
+                    <div class="modal-footer {{ app()->isLocale('fa') ? 'flex-row-reverse' : '' }}">
                         <button type="button"
                                 class="btn btn-secondary"
                                 wire:click="closeModal">
@@ -342,13 +392,6 @@
             modalInstance = null;
             $wire.resetForm();
         });
-
-        $wire.on('confirm-delete-task', ({id}) => {
-            if (confirm('{{ __("messages.confirm_delete") }}')) {
-                $wire.deleteConfirmed(id);
-            }
-        });
     </script>
     @endscript
 </div>
-

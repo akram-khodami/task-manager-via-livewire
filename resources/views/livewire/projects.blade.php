@@ -107,7 +107,9 @@
 
                                         <div class="card-footer bg-transparent border-0 pt-0 pb-3">
                                             <div class="d-flex justify-content-between align-items-center">
-                                                <div class="btn-group">
+                                                <div
+                                                    class="btn-group btn-group-sm {{ app()->isLocale('fa') ? 'btn-group-reverse' : '' }}"
+                                                    role="group">
                                                     <a class="btn btn-sm btn-outline-primary"
                                                        title="{{ __('messages.folders') }}"
                                                        href="{{ route('folders.index', $project->id) }}">
@@ -127,7 +129,8 @@
 
                                                     <button class="btn btn-sm btn-outline-danger"
                                                             wire:click="destroy({{ $project->id }})"
-                                                            wire:confirm="{{ __('messages.confirm_delete') }}">
+                                                            wire:confirm="{{ __('messages.confirm_delete') }}"
+                                                            title="{{ __('messages.delete') }}">
                                                         🗑️
                                                     </button>
                                                 </div>
@@ -241,12 +244,6 @@
         document.getElementById('projectModal')?.addEventListener('hidden.bs.modal', () => {
             modalInstance = null;
             $wire.resetForm();
-        });
-
-        $wire.on('confirm-delete-project', ({id}) => {
-            if (confirm('{{ __("messages.confirm_delete") }}')) {
-                $wire.deleteConfirmed(id);
-            }
         });
     </script>
     @endscript

@@ -32,6 +32,25 @@
                 border-bottom-right-radius: .3rem;
             }
         }
+
+        /*For RTL Style*/
+        .btn-group-reverse {
+            direction: ltr;
+        }
+
+        th[style*="cursor: pointer"]:hover {
+            background-color: #f0f0f0;
+            transition: background-color 0.2s;
+        }
+
+        .modal-header .btn-close {
+            margin: 0;
+        }
+
+        [dir="rtl"] .modal-header .btn-close {
+            margin-left: 0 !important;
+            margin-right: auto !important;
+        }
     </style>
     @livewireStyles
 </head>

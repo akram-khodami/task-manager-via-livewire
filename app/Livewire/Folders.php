@@ -68,7 +68,7 @@ class Folders extends Component
     public function create()
     {
         $this->resetForm();
-        $this->dispatch('open-modal');
+        $this->dispatch('open-folder-modal');
     }
 
     public function save()
@@ -84,7 +84,7 @@ class Folders extends Component
             ]
         );
 
-        $this->dispatch('close-modal');
+        $this->dispatch('close-folder-modal');
         session()->flash('message', $this->folderId ? __('messages.folder_updated') : __('messages.folder_created'));
     }
 
@@ -97,14 +97,10 @@ class Folders extends Component
         $this->projectId = $folder->project_id;
         $this->parentId = $folder->parent_id;
 
-        $this->dispatch('open-modal');
+        $this->dispatch('open-folder-modal');
     }
 
-    public function promptDelete(int $id)
-    {
-        $this->dispatch('confirm-delete', ['id' => $id]);
-    }
-
+    #[On('deleteConfirmed')]
     public function deleteConfirmed(int $id)
     {
         $folder = Folder::find($id);

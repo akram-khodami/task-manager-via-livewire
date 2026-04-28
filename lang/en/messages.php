@@ -2,8 +2,8 @@
 
 return [
 
-    'loading_text'=>'Loading...',
-    'loading'=>'Loading',
+    'loading_text' => 'Loading...',
+    'loading' => 'Loading',
     'saving' => 'Saving',
 
     //site text
@@ -192,5 +192,10 @@ return [
     'folder_not_found' => 'Folder not found.',
     'folder_not_empty' => 'Folder not empty.',
     'folder_not_empty' => 'Folder not empty.',
+
+    'all_users' => 'All Users',
+    'view' => 'View',
+    'view_task' => 'View Task',
+    'sort_by' => 'Sort By',
 
 ];

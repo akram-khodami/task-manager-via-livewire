@@ -51,7 +51,6 @@ class ProjectDetail extends Component
 
     public function backToProjects()
     {
-        // بستن تمام مودال‌های بوت‌استرپ قبل از ریدایرکت
         $this->dispatch('close-modal');
 
         return $this->redirect(route('projects'), navigate: true);

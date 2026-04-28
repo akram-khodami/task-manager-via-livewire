@@ -6,6 +6,7 @@ use App\Models\Folder;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -33,6 +34,24 @@ class Tasks extends Component
     public string $statusFilter = '';
     public ?int $filterByProjectId = null;
     public ?int $filterByFolderId = null;
+    public ?int $filterByUserId = null;
+
+    // sort
+    public string $sortField = 'created_at';
+    public string $sortDirection = 'desc';
+
+    protected array $sortableFields = [
+        'id',
+        'title',
+        'project_id',
+        'folder_id',
+        'status',
+        'assigned_to',
+        'due_date',
+        'estimated_hours',
+        'spent_hours',
+        'created_at'
+    ];
 
     protected function rules(): array
     {
@@ -51,8 +70,8 @@ class Tasks extends Component
 
     public function mount(?int $filterByProjectId = null, ?int $filterByFolderId = null): void
     {
-        $this->filterByProjectId = $filterByProjectId;
-        $this->filterByFolderId = $filterByFolderId;
+        $this->filterByProjectId = $filterByProjectId ?? ($_GET['projectId'] ?? null);
+        $this->filterByFolderId = $filterByFolderId ?? ($_GET['folderId'] ?? null);
         $this->projectId = $filterByProjectId;
         $this->folderId = $filterByFolderId;
         $this->assigned_to = auth()->id();
@@ -71,6 +90,34 @@ class Tasks extends Component
     public function updatedStatusFilter(): void
     {
         $this->resetPage();
+    }
+
+    public function updatedFilterByUserId(): void
+    {
+        $this->resetPage();
+    }
+
+    public function sortBy(string $field): void
+    {
+        if (!in_array($field, $this->sortableFields)) {
+            return;
+        }
+
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
+
+    public function getSortIcon(string $field): string
+    {
+        if ($this->sortField !== $field) {
+            return '↕️';
+        }
+
+        return $this->sortDirection === 'asc' ? '↑' : '↓';
     }
 
     #[Computed]
@@ -103,6 +150,14 @@ class Tasks extends Component
         return User::select('id', 'name')
             ->orderBy('name')
             ->limit(50)
+            ->get();
+    }
+
+    #[Computed]
+    public function allUsers()
+    {
+        return User::select('id', 'name')
+            ->orderBy('name')
             ->get();
     }
 
@@ -155,12 +210,12 @@ class Tasks extends Component
         $data = [
             'title' => trim($validated['title']),
             'description' => trim($validated['description'] ?? ''),
-            'project_id' => (int) $validated['projectId'],
-            'folder_id' => $validated['folderId'] ? (int) $validated['folderId'] : null,
+            'project_id' => (int)$validated['projectId'],
+            'folder_id' => $validated['folderId'] ? (int)$validated['folderId'] : null,
             'status' => $validated['status'],
             'due_date' => $validated['due_date'] ?? null,
-            'estimated_hours' => (float) ($validated['estimated_hours'] ?? 0),
-            'spent_hours' => (float) ($validated['spent_hours'] ?? 0),
+            'estimated_hours' => (float)($validated['estimated_hours'] ?? 0),
+            'spent_hours' => (float)($validated['spent_hours'] ?? 0),
             'assigned_to' => $validated['assigned_to'] ?? null,
         ];
 
@@ -197,11 +252,6 @@ class Tasks extends Component
 
         $task->update(['status' => $status]);
         session()->flash('message', __('messages.task_status_updated'));
-    }
-
-    public function promptDelete(int $id): void
-    {
-        $this->dispatch('confirm-delete-task', id: $id);
     }
 
     #[On('deleteConfirmed')]
@@ -252,7 +302,9 @@ class Tasks extends Component
             ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter))
             ->when($this->filterByProjectId, fn ($q) => $q->where('project_id', $this->filterByProjectId))
             ->when($this->filterByFolderId, fn ($q) => $q->where('folder_id', $this->filterByFolderId))
-            ->latest()
+            ->when($this->filterByUserId, fn ($q) => $q->where('assigned_to', $this->filterByUserId))
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->latest() // Fallback sort
             ->paginate(10);
     }
 }
