@@ -6,6 +6,7 @@ use App\Events\AssignedTask;
 use App\Listeners\NotifyAssignedTask;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -27,5 +28,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Paginator::useBootstrap();
         Paginator::useBootstrapFive();
+
+        Schema::defaultStringLength(191);
+
     }
 }
