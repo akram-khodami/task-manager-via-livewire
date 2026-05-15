@@ -126,7 +126,7 @@ class DocumentationBotService extends BaseBaleService
             case 'search':
                 $this->sendMessage($chatId,
                     "🔍 لطفاً عبارت مورد نظر را برای جستجو ارسال کنید:\n" .
-                    "مثال: laravel"
+                    "مثال: `laravel`"
                 );
                 break;
 
@@ -161,7 +161,7 @@ class DocumentationBotService extends BaseBaleService
 
         if ($results->isEmpty()) {
             $this->sendMessage($chatId,
-                "❌ نتیجه‌ای برای '{$searchTerm}' یافت نشد.\n" .
+                "❌ نتیجه‌ای برای `{$searchTerm}` یافت نشد.\n" .
                 "از /list برای مشاهده لیست کامل استفاده کنید."
             );
             return;
@@ -182,16 +182,17 @@ class DocumentationBotService extends BaseBaleService
      */
     private function sendWelcomeMessage(int $chatId): void
     {
+        // استفاده از متدهای helper برای Markdown
         $message = "👋 به ربات مستندات خوش آمدید!\n\n";
-        $message .= "🎯 <b>قابلیت‌های ربات:</b>\n";
+        $message .= "🎯 *قابلیت‌های ربات:*\n";
         $message .= "• جستجوی مستندات\n";
         $message .= "• نمایش لینک‌های مفید\n";
         $message .= "• راهنمایی برنامه‌نویسان\n\n";
-        $message .= "📚 <b>دستورات اصلی:</b>\n";
-        $message .= "/list - لیست مستندات\n";
-        $message .= "/search - جستجوی مستندات\n";
-        $message .= "/help - راهنمای کامل\n\n";
-        $message .= "می‌توانید نام تکنولوژی مورد نظر را مستقیماً ارسال کنید.";
+        $message .= "📚 *دستورات اصلی:*\n";
+        $message .= "`/list` \- لیست مستندات\n";
+        $message .= "`/search` \- جستجوی مستندات\n";
+        $message .= "`/help` \- راهنمای کامل\n\n";
+        $message .= "می‌توانید نام تکنولوژی مورد نظر را مستقیماً ارسال کنید\.";
 
         $keyboard = [
             [
@@ -211,17 +212,17 @@ class DocumentationBotService extends BaseBaleService
      */
     private function sendHelpMessage(int $chatId): void
     {
-        $message = "🆘 <b>راهنمای ربات مستندات</b>\n\n";
-        $message .= "<b>دستورات:</b>\n";
-        $message .= "/start - شروع و خوش‌آمدگویی\n";
-        $message .= "/list - لیست تمام مستندات\n";
-        $message .= "/search - جستجو در مستندات\n";
-        $message .= "/help - نمایش این راهنما\n";
-        $message .= "/[نام] - جستجوی مستقیم\n\n";
-        $message .= "<b>نکات:</b>\n";
+        $message = "🆘 *راهنمای ربات مستندات*\n\n";
+        $message .= "*دستورات:*\n";
+        $message .= "`/start` \- شروع و خوش‌آمدگویی\n";
+        $message .= "`/list` \- لیست تمام مستندات\n";
+        $message .= "`/search` \- جستجو در مستندات\n";
+        $message .= "`/help` \- نمایش این راهنما\n";
+        $message .= "`/[نام]` \- جستجوی مستقیم\n\n";
+        $message .= "*نکات:*\n";
         $message .= "• می‌توانید از دستورات در گروه‌ها هم استفاده کنید\n";
         $message .= "• برای جستجو، نام تکنولوژی را تایپ کنید\n";
-        $message .= "• مثال: laravel, php, vue";
+        $message .= "• مثال: `laravel`، `php`، `vue`";
 
         $this->sendMessage($chatId, $message);
     }
@@ -236,14 +237,17 @@ class DocumentationBotService extends BaseBaleService
             return;
         }
 
-        $message = "📚 <b>لیست مستندات موجود:</b>\n\n";
+        $message = "📚 *لیست مستندات موجود:*\n\n";
         $keyboard = [];
         $row = [];
         $count = 0;
 
         foreach ($this->docs as $key => $doc) {
             $emoji = $this->getTechEmoji($key);
-            $message .= "{$emoji} /{$key} - {$doc['title']}\n";
+            $escapedKey = $this->escapeMarkdown($key);
+            $escapedTitle = $this->escapeMarkdown($doc['title']);
+
+            $message .= "{$emoji} `/{$escapedKey}` \- {$escapedTitle}\n";
 
             $row[] = ['text' => "{$emoji} {$doc['title']}", 'callback_data' => "doc_{$key}"];
             $count++;
@@ -276,14 +280,16 @@ class DocumentationBotService extends BaseBaleService
         $doc = $this->docs[$docKey];
         $emoji = $this->getTechEmoji($docKey);
 
-        $message = "{$emoji} <b>{$doc['title']}</b>\n\n";
-        $message .= "📝 {$doc['description']}\n";
-        $message .= "🔗 <a href='{$doc['url']}'>لینک مستندات</a>\n";
+        // استفاده از Markdown برای لینک‌ها و فرمت
+        $message = "{$emoji} *{$this->escapeMarkdown($doc['title'])}*\n\n";
+        $message .= "📝 {$this->escapeMarkdown($doc['description'])}\n";
+        $message .= "🔗 [لینک مستندات]({$doc['url']})\n";
 
         if (isset($doc['categories'])) {
-            $message .= "\n📂 <b>دسته‌بندی‌ها:</b>\n";
+            $message .= "\n📂 *دسته‌بندی‌ها:*\n";
             foreach ($doc['categories'] as $catKey => $catName) {
-                $message .= "• {$catName}\n";
+                $escapedCatName = $this->escapeMarkdown($catName);
+                $message .= "• {$escapedCatName}\n";
             }
         }
 
@@ -305,12 +311,14 @@ class DocumentationBotService extends BaseBaleService
      */
     private function sendDocumentSearchResults(int $chatId, $results): void
     {
-        $message = "🔍 <b>نتایج جستجو:</b>\n\n";
+        $message = "🔍 *نتایج جستجو:*\n\n";
         $keyboard = [];
 
         foreach ($results as $key => $doc) {
             $emoji = $this->getTechEmoji($key);
-            $message .= "{$emoji} {$doc['title']}\n";
+            $escapedTitle = $this->escapeMarkdown($doc['title']);
+
+            $message .= "{$emoji} {$escapedTitle}\n";
 
             $keyboard[] = [[
                 'text' => "{$emoji} {$doc['title']}",
@@ -377,7 +385,7 @@ class DocumentationBotService extends BaseBaleService
      */
     private function getTechEmoji(string $key): string
     {
-        return match($key){
+        return match($key) {
         'laravel' => '🔥',
             'php' => '🐘',
             'bale' => '💬',

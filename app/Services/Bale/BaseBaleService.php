@@ -11,6 +11,8 @@ abstract class BaseBaleService
     protected string $token;
     protected ?int $chatId = null;
 
+    protected string $parseMode = 'Markdown';
+
     public function __construct(string $token)
     {
         $this->token = $token;
@@ -22,6 +24,15 @@ abstract class BaseBaleService
     public function setChatId(?int $chatId): self
     {
         $this->chatId = $chatId;
+        return $this;
+    }
+
+    /**
+     * Set parse mode
+     */
+    public function setParseMode(string $mode): self
+    {
+        $this->parseMode = $mode;
         return $this;
     }
 
@@ -69,6 +80,61 @@ abstract class BaseBaleService
     }
 
     /**
+     * Escape Markdown special characters
+     */
+    protected function escapeMarkdown(string $text): string
+    {
+        $chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
+        $escaped = [];
+
+        foreach ($chars as $char) {
+            $escaped[] = '\\' . $char;
+        }
+
+        return str_replace($chars, $escaped, $text);
+    }
+
+    /**
+     * Format bold text in Markdown
+     */
+    protected function bold(string $text): string
+    {
+        return '*' . $text . '*';
+    }
+
+    /**
+     * Format italic text in Markdown
+     */
+    protected function italic(string $text): string
+    {
+        return '_' . $text . '_';
+    }
+
+    /**
+     * Format inline code
+     */
+    protected function code(string $text): string
+    {
+        return '`' . $text . '`';
+    }
+
+    /**
+     * Format code block
+     */
+    protected function codeBlock(string $text, string $language = ''): string
+    {
+        return "```{$language}\n{$text}\n```";
+    }
+
+    /**
+     * Format link in Markdown
+     */
+    protected function link(string $text, string $url): string
+    {
+        return '[' . $text . '](' . $url . ')';
+    }
+
+    /**
      * Send message to user/group
      */
     public function sendMessage(int|string $chatId, string $text, array $options = []): array
@@ -76,7 +142,7 @@ abstract class BaseBaleService
         $params = array_merge([
             'chat_id' => $chatId,
             'text' => $text,
-            'parse_mode' => 'HTML'
+            'parse_mode' => $this->parseMode
         ], $options);
 
         return $this->sendRequest('sendMessage', $params);
@@ -91,7 +157,7 @@ public function sendPhoto(int|string $chatId, string $photo, string $caption = '
             'chat_id' => $chatId,
             'photo' => $photo,
             'caption' => $caption,
-            'parse_mode' => 'HTML'
+            'parse_mode' => $this->parseMode
         ], $options);
 
         return $this->sendRequest('sendPhoto', $params);
@@ -106,7 +172,7 @@ public function sendPhoto(int|string $chatId, string $photo, string $caption = '
             'chat_id' => $chatId,
             'document' => $document,
             'caption' => $caption,
-            'parse_mode' => 'HTML'
+            'parse_mode' => $this->parseMode
         ], $options);
 
         return $this->sendRequest('sendDocument', $params);
@@ -121,7 +187,7 @@ public function sendPhoto(int|string $chatId, string $photo, string $caption = '
             'chat_id' => $chatId,
             'message_id' => $messageId,
             'text' => $text,
-            'parse_mode' => 'HTML'
+            'parse_mode' => $this->parseMode
         ], $options);
 
         return $this->sendRequest('editMessageText', $params);
@@ -146,7 +212,7 @@ public function sendPhoto(int|string $chatId, string $photo, string $caption = '
         $params = array_merge([
             'chat_id' => $chatId,
             'text' => $text,
-            'parse_mode' => 'HTML',
+            'parse_mode' => $this->parseMode,
             'reply_markup' => json_encode([
                 'inline_keyboard' => $keyboard
             ])
