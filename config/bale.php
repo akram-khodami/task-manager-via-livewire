@@ -13,6 +13,12 @@ return [
             'name' => 'Documentation Bot',
             'service' => \App\Services\Bale\DocumentationBotService::class,
         ],
+        'hafezfal' => [
+            'token' => env('BALE_HAFEZ_FAL_BOT_TOKEN'),
+            'webhook_url' => env('APP_URL') . 'api/webhook/bale/hafezfal',
+            'name' => 'Hafezfal Bot',
+            'service' => \App\Services\Bale\HafezFalBotService::class,
+        ],
         'resume' => [
             'token' => env('BALE_RESUME_TOKEN'),
             'webhook_url' => env('APP_URL') . 'api/webhook/bale/resume',

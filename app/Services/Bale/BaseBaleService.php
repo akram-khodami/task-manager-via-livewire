@@ -281,4 +281,42 @@ public function sendPhoto(int|string $chatId, string $photo, string $caption = '
      * Process incoming update (abstract - each bot implements differently)
      */
     abstract public function processUpdate(array $update): void;
+
+
+/**
+ * ارسال فاکتور پرداخت به یک کاربر
+ */
+public function sendInvoice(int|string $chatId, array $invoiceData): array
+{
+    $params = array_merge(['chat_id' => $chatId], $invoiceData);
+
+    // اطمینان از اینکه قیمت‌ها به فرمت صحیح هستند
+    // Prices should be an array of ['label' => '...', 'amount' => 1000]
+    if (isset($params['prices'])) {
+        $params['prices'] = json_encode($params['prices']);
+    }
+
+    // پردازش reply_markup اگر وجود داشته باشد
+    if (isset($params['reply_markup'])) {
+        $params['reply_markup'] = json_encode($params['reply_markup']);
+    }
+
+    return $this->sendRequest('sendInvoice', $params);
+}
+
+/**
+ * پاسخ به یک درخواست پرداخت موفق (pre_checkout_query)
+ * این متد برای تایید یا رد یک پرداخت قبل از کسر وجه استفاده می‌شود.
+ */
+public function answerPreCheckoutQuery(string $preCheckoutQueryId, bool $ok, string $errorMessage = ''): array
+{
+    $params = [
+        'pre_checkout_query_id' => $preCheckoutQueryId,
+        'ok' => $ok
+    ];
+    if (!$ok) {
+        $params['error_message'] = $errorMessage;
+    }
+    return $this->sendRequest('answerPreCheckoutQuery', $params);
+}
 }
