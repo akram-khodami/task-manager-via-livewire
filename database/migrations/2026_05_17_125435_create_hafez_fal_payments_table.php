@@ -11,15 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // مطمئن شو migration درست اجرا شده
         Schema::create('hafez_fal_payments', function (Blueprint $table) {
             $table->id();
-            $table->integer('chat_id');
-            $table->string('payload');
-            $table->string('status')->default(null);//        'status', // pending, paid, failed
+            $table->bigInteger('chat_id');
+            $table->string('payload')->unique();
             $table->integer('amount');
-            $table->integer('bale_payment_id')->default(null);
-            $table->date('paid_at');
+            $table->string('status')->default('pending'); // pending, paid, failed
+            $table->string('bale_payment_id')->nullable();
+            $table->text('payment_info')->nullable(); // JSON string
+            $table->timestamp('paid_at')->nullable();
             $table->timestamps();
+
+            $table->index(['chat_id', 'status']);
+            $table->index('payload');
         });
     }
 
