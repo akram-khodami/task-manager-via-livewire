@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>دستیار شخصی من</title>
     <link href="{{ url('css/bootstrap.min.css') }}" rel="stylesheet">
-
-    {{-- SDK مینی‌اپ بله - حتماً قبل از هر اسکریپت دیگه --}}
     <script src="https://tapi.bale.ai/miniapp.js?3"></script>
 
     <style>
@@ -72,6 +70,14 @@
             opacity: 0;
             pointer-events: none;
         }
+
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -85,15 +91,13 @@
     </div>
 </div>
 
-{{-- محتوای اصلی --}}
-<div id="mainContent" class="miniapp-container" style="display: none;">
-    {{-- هدر --}}
+{{-- ========= صفحه اصلی ========= --}}
+<div id="homePage" class="miniapp-container page-content">
     <div class="text-center mb-4">
         <h4 class="fw-bold">دستیار شخصی من</h4>
         <p class="text-muted small">خوش آمدید!</p>
     </div>
 
-    {{-- اطلاعات کاربر --}}
     <div class="card feature-card mb-4">
         <div class="card-body text-center">
             <div class="feature-icon">👤</div>
@@ -102,9 +106,7 @@
         </div>
     </div>
 
-    {{-- منوی ابزارها --}}
     <div class="row g-3">
-        {{-- لیست کارها --}}
         <div class="col-6">
             <div class="card feature-card h-100" onclick="navigateTo('todos')">
                 <div class="card-body text-center">
@@ -115,7 +117,6 @@
             </div>
         </div>
 
-        {{-- پرداخت --}}
         <div class="col-6">
             <div class="card feature-card h-100" onclick="navigateTo('payment')">
                 <div class="card-body text-center">
@@ -126,7 +127,6 @@
             </div>
         </div>
 
-        {{-- اسکنر QR --}}
         <div class="col-6">
             <div class="card feature-card h-100" onclick="navigateTo('scanner')">
                 <div class="card-body text-center">
@@ -137,7 +137,6 @@
             </div>
         </div>
 
-        {{-- تنظیمات --}}
         <div class="col-6">
             <div class="card feature-card h-100" onclick="navigateTo('settings')">
                 <div class="card-body text-center">
@@ -149,238 +148,240 @@
         </div>
     </div>
 
-    {{-- دکمه‌های عملیاتی --}}
     <div class="mt-4">
         <button class="btn btn-outline-primary w-100 mb-2" onclick="requestContact()">
-            <span class="icon-phone" style="font-size:1.5rem;">📞</span> دریافت شماره تماس
+            📞 دریافت شماره تماس
         </button>
         <button class="btn btn-outline-secondary w-100 mb-2" onclick="addToHomeScreen()">
-            <span class="icon-plus" style="font-size:1.5rem;">➕</span> افزودن به صفحه اصلی
+            ➕ افزودن به صفحه اصلی
         </button>
     </div>
-
-
-    {{-- این کد رو به view اصلی اضافه کن، داخل mainContent --}}
-
-    {{-- بخش تنظیمات (در ابتدا hidden) --}}
-    <div id="settingsPage" style="display: none;">
-        <div class="mb-4">
-            <button class="btn btn-outline-secondary btn-sm" onclick="goBack()">
-                <i class="bi bi-arrow-right"></i> بازگشت
-            </button>
-            <h4 class="d-inline-block me-3">⚙️ تنظیمات</h4>
-        </div>
-
-        {{-- تنظیمات هدر --}}
-        <div class="card feature-card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">تنظیمات ظاهری</h5>
-
-                <div class="mb-3">
-                    <label class="form-label">رنگ هدر</label>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm flex-grow-1" style="background: #007AFF; color: white;"
-                                onclick="changeHeaderColor('#007AFF')">آبی</button>
-                        <button class="btn btn-sm flex-grow-1" style="background: #34C759; color: white;"
-                                onclick="changeHeaderColor('#34C759')">سبز</button>
-                        <button class="btn btn-sm flex-grow-1" style="background: #FF3B30; color: white;"
-                                onclick="changeHeaderColor('#FF3B30')">قرمز</button>
-                        <button class="btn btn-sm flex-grow-1" style="background: #FF9500; color: white;"
-                                onclick="changeHeaderColor('#FF9500')">نارنجی</button>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">حالت تمام‌صفحه</label>
-                    <button class="btn btn-outline-primary w-100" onclick="toggleFullscreen()">
-                        <i class="bi bi-arrows-fullscreen"></i>
-                        <span id="fullscreenBtnText">فعال‌سازی حالت تمام‌صفحه</span>
-                    </button>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">تأیید خروج</label>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="confirmClose"
-                               onchange="toggleConfirmClose(this.checked)">
-                        <label class="form-check-label" for="confirmClose">
-                            هنگام بستن مینی‌اپ تأیید بگیر
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- تم فعلی --}}
-        <div class="card feature-card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">تم فعلی</h5>
-                <div class="row" id="themeColors">
-                    <!-- با جاوااسکریپت پر میشه -->
-                </div>
-            </div>
-        </div>
-
-        {{-- وضعیت میانبر --}}
-        <div class="card feature-card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">میانبر صفحه اصلی</h5>
-                <div id="homeScreenStatus">
-                    <button class="btn btn-outline-primary w-100" onclick="checkHomeScreen()">
-                        <i class="bi bi-info-circle"></i> بررسی وضعیت میانبر
-                    </button>
-                    <div id="homeScreenResult" class="mt-2 small"></div>
-                </div>
-            </div>
-        </div>
-
-        {{-- اطلاعات نسخه --}}
-        <div class="card feature-card">
-            <div class="card-body">
-                <h5 class="card-title">درباره</h5>
-                <ul class="list-unstyled small mb-0">
-                    <li>نسخه مینی‌اپ: <span id="miniappVersion">-</span></li>
-                    <li>پلتفرم: <span id="platformType">-</span></li>
-                    <li>تم سیستم: <span id="colorScheme">-</span></li>
-                    <li>پشتیبانی مینی‌اپ: <span id="miniAppSupported">-</span></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    {{-- بخش اسکنر QR (در ابتدا hidden) --}}
-    <div id="scannerPage" style="display: none;">
-        <div class="mb-4">
-            <button class="btn btn-outline-secondary btn-sm" onclick="goBack()">
-                <i class="bi bi-arrow-right"></i> بازگشت
-            </button>
-            <h4 class="d-inline-block me-3">📷 اسکنر QR</h4>
-        </div>
-
-        {{-- دکمه اسکن --}}
-        <div class="card feature-card mb-3">
-            <div class="card-body text-center">
-                <div class="feature-icon" style="font-size: 4rem;">📷</div>
-                <h5>اسکن کد QR</h5>
-                <p class="text-muted small">دوربین رو به سمت QR code بگیرید</p>
-                <button class="btn btn-primary w-100" onclick="startScanning()">
-                    <i class="bi bi-qr-code-scan"></i> شروع اسکن
-                </button>
-            </div>
-        </div>
-
-        {{-- نتیجه اسکن --}}
-        <div id="scanResult" style="display: none;">
-            <div class="card feature-card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">✅ نتیجه اسکن</h5>
-                    <div class="p-3 bg-light rounded">
-                        <code id="scanText" class="text-break"></code>
-                    </div>
-                    <div class="mt-3">
-                        <button class="btn btn-outline-primary btn-sm" onclick="copyScanResult()">
-                            <i class="bi bi-clipboard"></i> کپی
-                        </button>
-                        <button class="btn btn-outline-success btn-sm" onclick="openScannedLink()">
-                            <i class="bi bi-box-arrow-up-right"></i> باز کردن لینک
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- تاریخچه اسکن‌ها --}}
-        <div class="card feature-card">
-            <div class="card-body">
-                <h5 class="card-title">📋 تاریخچه اسکن‌ها</h5>
-                <div id="scanHistory">
-                    <p class="text-muted small">هنوز اسکنی انجام نشده</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
 
-<script>
-    // متغیرهای سراسری
-    let BaleApp;
-    let currentUser = null;
+{{-- ========= صفحه تنظیمات ========= --}}
+<div id="settingsPage" class="miniapp-container page-content">
+    <div class="mb-4">
+        <button class="btn btn-outline-secondary btn-sm" onclick="goBack()">
+            🔙 بازگشت
+        </button>
+        <h4 class="d-inline-block me-3">⚙️ تنظیمات</h4>
+    </div>
 
-    // وقتی DOM آماده شد
+    <div class="card feature-card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">تنظیمات ظاهری</h5>
+
+            <div class="mb-3">
+                <label class="form-label">رنگ هدر</label>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm flex-grow-1" style="background: #007AFF; color: white;"
+                            onclick="changeHeaderColor('#007AFF')">آبی</button>
+                    <button class="btn btn-sm flex-grow-1" style="background: #34C759; color: white;"
+                            onclick="changeHeaderColor('#34C759')">سبز</button>
+                    <button class="btn btn-sm flex-grow-1" style="background: #FF3B30; color: white;"
+                            onclick="changeHeaderColor('#FF3B30')">قرمز</button>
+                    <button class="btn btn-sm flex-grow-1" style="background: #FF9500; color: white;"
+                            onclick="changeHeaderColor('#FF9500')">نارنجی</button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">حالت تمام‌صفحه</label>
+                <button class="btn btn-outline-primary w-100" onclick="toggleFullscreen()">
+                    <span id="fullscreenBtnText">فعال‌سازی حالت تمام‌صفحه</span>
+                </button>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">تأیید خروج</label>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="confirmClose"
+                           onchange="toggleConfirmClose(this.checked)">
+                    <label class="form-check-label" for="confirmClose">
+                        هنگام بستن مینی‌اپ تأیید بگیر
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card feature-card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">تم فعلی</h5>
+            <div class="row" id="themeColors"></div>
+        </div>
+    </div>
+
+    <div class="card feature-card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">میانبر صفحه اصلی</h5>
+            <button class="btn btn-outline-primary w-100" onclick="checkHomeScreen()">
+                بررسی وضعیت میانبر
+            </button>
+            <div id="homeScreenResult" class="mt-2 small"></div>
+        </div>
+    </div>
+
+    <div class="card feature-card">
+        <div class="card-body">
+            <h5 class="card-title">درباره</h5>
+            <ul class="list-unstyled small mb-0">
+                <li>نسخه مینی‌اپ: <span id="miniappVersion">-</span></li>
+                <li>پلتفرم: <span id="platformType">-</span></li>
+                <li>تم سیستم: <span id="colorScheme">-</span></li>
+                <li>پشتیبانی مینی‌اپ: <span id="miniAppSupported">-</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{{-- ========= صفحه اسکنر ========= --}}
+<div id="scannerPage" class="miniapp-container page-content">
+    <div class="mb-4">
+        <button class="btn btn-outline-secondary btn-sm" onclick="goBack()">
+            🔙 بازگشت
+        </button>
+        <h4 class="d-inline-block me-3">📷 اسکنر QR</h4>
+    </div>
+
+    <div class="card feature-card mb-3">
+        <div class="card-body text-center">
+            <div style="font-size: 4rem;">📷</div>
+            <h5>اسکن کد QR</h5>
+            <p class="text-muted small">دوربین رو به سمت QR code بگیرید</p>
+            <button class="btn btn-primary w-100" onclick="startScanning()">
+                شروع اسکن
+            </button>
+        </div>
+    </div>
+
+    <div id="scanResult" style="display: none;">
+        <div class="card feature-card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">✅ نتیجه اسکن</h5>
+                <div class="p-3 bg-light rounded">
+                    <code id="scanText" class="text-break"></code>
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-outline-primary btn-sm" onclick="copyScanResult()">
+                        📋 کپی
+                    </button>
+                    <button class="btn btn-outline-success btn-sm" onclick="openScannedLink()">
+                        🔗 باز کردن لینک
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card feature-card">
+        <div class="card-body">
+            <h5 class="card-title">📋 تاریخچه اسکن‌ها</h5>
+            <div id="scanHistory">
+                <p class="text-muted small">هنوز اسکنی انجام نشده</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ========= Toast Container ========= --}}
+<div id="toastContainer" class="position-fixed bottom-0 start-50 translate-middle-x p-3" style="z-index: 9999;"></div>
+
+<script>
+    // ============ متغیرهای سراسری ============
+    let BaleApp;
+    let currentUser;
+    let currentPage = 'home';
+    let pageHistory = ['home'];
+    let lastScannedText = '';
+
+    // ============ شروع ============
     document.addEventListener('DOMContentLoaded', function () {
         initMiniApp();
     });
 
     function initMiniApp() {
-        // بررسی وجود SDK
         if (!window.Bale || !window.Bale.WebApp) {
             showError('SDK بله بارگذاری نشده است');
             return;
         }
 
         BaleApp = window.Bale.WebApp;
-
         console.log('نسخه مینی‌اپ:', BaleApp.version);
         console.log('تم:', BaleApp.colorScheme);
 
-        // اعمال تم
         applyTheme(BaleApp.themeParams);
-
-        // دریافت و نمایش اطلاعات کاربر
         loadUserInfo();
+        setupEventListeners();
+        setupHeaderButtons();
 
-        // آماده‌سازی مینی‌اپ
         BaleApp.ready();
 
-        // مخفی کردن اسکرین بارگذاری
         setTimeout(() => {
             document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('mainContent').style.display = 'block';
+            navigateTo('home');
         }, 500);
-
-        // تنظیم دکمه‌های هدر
-        setupHeaderButtons();
     }
 
+    function setupEventListeners() {
+        // دکمه بازگشت بله
+        if (BaleApp.BackButton) {
+            BaleApp.BackButton.onClick(() => goBack());
+        }
+
+        // رویدادهای اسکنر
+        BaleApp.onEvent('qrTextReceived', function (data) {
+            lastScannedText = data.text;
+            document.getElementById('scanResult').style.display = 'block';
+            document.getElementById('scanText').textContent = data.text;
+            addToScanHistory(data.text);
+            showToast('✅ اسکن با موفقیت انجام شد');
+        });
+
+        BaleApp.onEvent('scanQrPopupClosed', function () {
+            showToast('اسکنر بسته شد');
+        });
+
+        // رویدادهای میانبر
+        BaleApp.onEvent('homeScreenAdded', function () {
+            showToast('🎉 میانبر با موفقیت اضافه شد');
+        });
+
+        BaleApp.onEvent('homeScreenFailed', function () {
+            showToast('❌ خطا در افزودن میانبر');
+        });
+    }
+
+    // ============ تم ============
     function applyTheme(themeParams) {
+        if (!themeParams) return;
         const root = document.documentElement;
 
-        if (themeParams.bg_color) {
-            root.style.setProperty('--bg-color', themeParams.bg_color);
-        }
-        if (themeParams.text_color) {
-            root.style.setProperty('--text-color', themeParams.text_color);
-        }
-        if (themeParams.secondary_bg_color) {
-            root.style.setProperty('--card-bg', themeParams.secondary_bg_color);
-        }
-        if (themeParams.button_color) {
-            root.style.setProperty('--primary-btn', themeParams.button_color);
-        }
-        if (themeParams.button_text_color) {
-            root.style.setProperty('--primary-btn-text', themeParams.button_text_color);
-        }
+        const map = {
+            bg_color: '--bg-color',
+            text_color: '--text-color',
+            secondary_bg_color: '--card-bg',
+            button_color: '--primary-btn',
+            button_text_color: '--primary-btn-text'
+        };
+
+        Object.entries(map).forEach(([key, cssVar]) => {
+            if (themeParams[key]) {
+                root.style.setProperty(cssVar, themeParams[key]);
+            }
+        });
     }
 
-    //read
+    // ============ اطلاعات کاربر ============
     function loadUserInfo() {
         if (BaleApp.initDataUnsafe && BaleApp.initDataUnsafe.user) {
             currentUser = BaleApp.initDataUnsafe.user;
-
-            let userInfoHtml = `
-                    ${currentUser.first_name || 'کاربر'}
-                    ${currentUser.username ? '@' + currentUser.username : ''}
-                `;
-
-            document.getElementById('userInfo').innerHTML = userInfoHtml;
-
-            // اعتبارسنجی داده‌ها در سرور
+            const html = `${currentUser.first_name || 'کاربر'} ${currentUser.username ? '@' + currentUser.username : ''}`;
+            document.getElementById('userInfo').innerHTML = html;
             validateWithServer(BaleApp.initData);
         }
     }
 
-    //read
     async function validateWithServer(initData) {
         try {
             const response = await fetch('/api/miniapp/validate', {
@@ -389,9 +390,8 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({initData: initData})
+                body: JSON.stringify({ initData })
             });
-
             const result = await response.json();
             console.log('نتیجه اعتبارسنجی:', result);
         } catch (error) {
@@ -399,270 +399,179 @@
         }
     }
 
+    // ============ هدر ============
     function setupHeaderButtons() {
-        // دکمه تنظیمات در منوی زمینه
         if (BaleApp.SettingsButton) {
             BaleApp.SettingsButton.show();
-            BaleApp.SettingsButton.onClick(() => {
-                navigateTo('settings');
-            });
+            BaleApp.SettingsButton.onClick(() => navigateTo('settings'));
         }
     }
 
-    //read1
-    function requestContact() {
-        if (BaleApp.requestContact) {
-            BaleApp.requestContact(function (shared, contact) {
-                if (shared) {
-                    alert('شماره تماس دریافت شد: ' + contact);//todo:dont use alert
-                } else {
-                    alert('کاربر اجازه دسترسی نداد');//todo:dont use alert
-                }
-            });
-        }
-    }
-
-    //read2
-    function addToHomeScreen() {
-        if (BaleApp.addToHomeScreen) {
-            BaleApp.addToHomeScreen();
-        }
-    }
-
-    function showError(message) {
-        document.getElementById('loadingScreen').innerHTML = `
-                <div class="text-center text-danger">
-                    <span class="icon-warning" style="font-size:3rem; color:#e69c00;">⚠️</span>
-                    <h5 class="mt-3">خطا</h5>
-                    <p>${message}</p>
-                </div>
-            `;
-    }
-</script>
-
-<script>
-    // این کد رو به بخش script view اضافه کن
-
-    // ======= مدیریت ناوبری (Memory Router ساده) =======
-    let currentPage = 'home';
-    let pageHistory = ['home'];
-
+    // ============ ناوبری ============
     function navigateTo(page) {
-        // مخفی کردن همه صفحات
-        document.getElementById('mainContent').style.display = 'none';
-        document.getElementById('settingsPage').style.display = 'none';
-        document.getElementById('scannerPage').style.display = 'none';
+        document.querySelectorAll('.page-content').forEach(el => el.classList.remove('active'));
 
-        // نمایش صفحه مورد نظر
-        switch(page) {
+        switch (page) {
+            case 'home':
+                document.getElementById('homePage').classList.add('active');
+                if (BaleApp && BaleApp.BackButton) BaleApp.BackButton.hide();
+                break;
             case 'settings':
-                document.getElementById('settingsPage').style.display = 'block';
+                document.getElementById('settingsPage').classList.add('active');
                 loadSettings();
+                if (BaleApp && BaleApp.BackButton) BaleApp.BackButton.show();
                 break;
             case 'scanner':
-                document.getElementById('scannerPage').style.display = 'block';
+                document.getElementById('scannerPage').classList.add('active');
+                if (BaleApp && BaleApp.BackButton) BaleApp.BackButton.show();
                 break;
             default:
-                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('homePage').classList.add('active');
         }
 
-        // ذخیره تاریخچه
         pageHistory.push(page);
         currentPage = page;
-
-        // نمایش دکمه بازگشت در هدر
-        if (page !== 'home' && BaleApp.BackButton) {
-            BaleApp.BackButton.show();
-        }
     }
 
     function goBack() {
-        // حذف صفحه فعلی از تاریخچه
         pageHistory.pop();
-
-        // برگشت به صفحه قبلی
         const previousPage = pageHistory[pageHistory.length - 1] || 'home';
-
-        // مخفی کردن دکمه بازگشت اگر برگشتیم به خانه
-        if (previousPage === 'home' && BaleApp.BackButton) {
-            BaleApp.BackButton.hide();
-        }
-
         navigateTo(previousPage);
     }
 
-    // گوش دادن به دکمه بازگشت بله
-    if (BaleApp && BaleApp.BackButton) {
-        BaleApp.BackButton.onClick(() => {
-            goBack();
+    // ============ دکمه‌های عملیاتی ============
+    function requestContact() {
+        if (!BaleApp || !BaleApp.requestContact) {
+            showToast('❌ این قابلیت پشتیبانی نمی‌شود');
+            return;
+        }
+        BaleApp.requestContact(function (shared, contact) {
+            if (shared) {
+                showToast('📞 شماره تماس دریافت شد: ' + contact);
+            } else {
+                showToast('⚠️ کاربر اجازه دسترسی نداد');
+            }
         });
     }
 
-    // ======= تنظیمات =======
+    function addToHomeScreen() {
+        if (BaleApp && BaleApp.addToHomeScreen) {
+            BaleApp.addToHomeScreen();
+        } else {
+            showToast('❌ این قابلیت پشتیبانی نمی‌شود');
+        }
+    }
+
+    // ============ تنظیمات ============
     function changeHeaderColor(color) {
-        if (BaleApp.setHeaderColor) {
+        if (BaleApp && BaleApp.setHeaderColor) {
             BaleApp.setHeaderColor(color);
-            showToast('رنگ هدر با موفقیت تغییر کرد 🎨');
+            showToast('🎨 رنگ هدر با موفقیت تغییر کرد');
         }
     }
 
     function toggleFullscreen() {
         const btn = document.getElementById('fullscreenBtnText');
         if (btn.textContent.includes('فعال')) {
-            if (BaleApp.expand) {
+            if (BaleApp && BaleApp.expand) {
                 BaleApp.expand();
                 btn.textContent = 'غیرفعال‌سازی حالت تمام‌صفحه';
-                showToast('حالت تمام‌صفحه فعال شد 📱');
+                showToast('📱 حالت تمام‌صفحه فعال شد');
             }
         } else {
-            // متأسفانه API برای غیرفعال کردن expand وجود نداره
-            showToast('برای خروج از حالت تمام‌صفحه، مینی‌اپ رو ببندید و دوباره باز کنید');
+            showToast('برای خروج، مینی‌اپ را ببندید و دوباره باز کنید');
         }
     }
 
     function toggleConfirmClose(enabled) {
-        if (enabled) {
-            if (BaleApp.enableClosingConfirmation) {
-                BaleApp.enableClosingConfirmation();
-                showToast('تأیید خروج فعال شد 🔒');
-            }
-        } else {
-            if (BaleApp.disableClosingConfirmation) {
-                BaleApp.disableClosingConfirmation();
-                showToast('تأیید خروج غیرفعال شد 🔓');
-            }
+        if (!BaleApp) return;
+        if (enabled && BaleApp.enableClosingConfirmation) {
+            BaleApp.enableClosingConfirmation();
+            showToast('🔒 تأیید خروج فعال شد');
+        } else if (!enabled && BaleApp.disableClosingConfirmation) {
+            BaleApp.disableClosingConfirmation();
+            showToast('🔓 تأیید خروج غیرفعال شد');
         }
     }
 
     function checkHomeScreen() {
-        if (BaleApp.checkHomeScreenStatus) {
-            BaleApp.checkHomeScreenStatus(function(status) {
-                const resultDiv = document.getElementById('homeScreenResult');
-                let message = '';
+        if (!BaleApp || !BaleApp.checkHomeScreenStatus) return;
 
-                switch(status) {
-                    case 'unsupported':
-                        message = '❌ دستگاه شما از این قابلیت پشتیبانی نمی‌کند';
-                        break;
-                    case 'unknown':
-                        message = '⚠️ وضعیت میانبر قابل تشخیص نیست';
-                        break;
-                    case 'added':
-                        message = '✅ میانبر قبلاً به صفحه اصلی اضافه شده';
-                        break;
-                    case 'missed':
-                        message = '➕ میانبر اضافه نشده. می‌توانید اضافه کنید';
-                        break;
-                }
-
-                resultDiv.innerHTML = `<div class="alert alert-info">${message}</div>`;
-            });
-        }
+        BaleApp.checkHomeScreenStatus(function (status) {
+            const messages = {
+                unsupported: '❌ دستگاه شما از این قابلیت پشتیبانی نمی‌کند',
+                unknown: '⚠️ وضعیت میانبر قابل تشخیص نیست',
+                added: '✅ میانبر قبلاً به صفحه اصلی اضافه شده',
+                missed: '➕ میانبر اضافه نشده. می‌توانید اضافه کنید'
+            };
+            document.getElementById('homeScreenResult').innerHTML =
+                `<div class="alert alert-info">${messages[status] || status}</div>`;
+        });
     }
 
     function loadSettings() {
-        // پر کردن اطلاعات سیستم
-        if (BaleApp) {
-            document.getElementById('miniappVersion').textContent = BaleApp.version || 'نامشخص';
-            document.getElementById('platformType').textContent = BaleApp.isIframe ? 'وب' : 'اندروید';
-            document.getElementById('colorScheme').textContent = BaleApp.colorScheme || 'نامشخص';
-            document.getElementById('miniAppSupported').textContent = BaleApp.isMiniAppSupported ? '✅ بله' : '❌ خیر';
+        if (!BaleApp) return;
+        document.getElementById('miniappVersion').textContent = BaleApp.version || 'نامشخص';
+        document.getElementById('platformType').textContent = BaleApp.isIframe ? 'وب' : 'اندروید';
+        document.getElementById('colorScheme').textContent = BaleApp.colorScheme || 'نامشخص';
+        document.getElementById('miniAppSupported').textContent = BaleApp.isMiniAppSupported ? '✅ بله' : '❌ خیر';
 
-            // نمایش رنگ‌های تم
-            if (BaleApp.themeParams) {
-                const colors = BaleApp.themeParams;
-                let html = '';
+        if (BaleApp.themeParams) {
+            const colorMap = {
+                bg_color: 'پس‌زمینه اصلی',
+                text_color: 'رنگ متن',
+                hint_color: 'متن راهنما',
+                link_color: 'لینک‌ها',
+                button_color: 'دکمه‌ها',
+                button_text_color: 'متن دکمه',
+                secondary_bg_color: 'پس‌زمینه ثانویه'
+            };
 
-                const colorMap = {
-                    'bg_color': 'پس‌زمینه اصلی',
-                    'text_color': 'رنگ متن',
-                    'hint_color': 'متن راهنما',
-                    'link_color': 'لینک‌ها',
-                    'button_color': 'دکمه‌ها',
-                    'button_text_color': 'متن دکمه',
-                    'secondary_bg_color': 'پس‌زمینه ثانویه'
-                };
-
-                for (const [key, value] of Object.entries(colorMap)) {
-                    if (colors[key]) {
-                        html += `
-                        <div class="col-6 mb-2">
-                            <div class="d-flex align-items-center gap-2">
-                                <div style="width: 24px; height: 24px; background: ${colors[key]};
-                                            border-radius: 50%; border: 1px solid #ddd;"></div>
-                                <small>${value}</small>
-                            </div>
-                        </div>
-                    `;
-                    }
+            let html = '';
+            Object.entries(colorMap).forEach(([key, name]) => {
+                if (BaleApp.themeParams[key]) {
+                    html += `
+                            <div class="col-6 mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="width:24px;height:24px;background:${BaleApp.themeParams[key]};border-radius:50%;border:1px solid #ddd;"></div>
+                                    <small>${name}</small>
+                                </div>
+                            </div>`;
                 }
-
-                document.getElementById('themeColors').innerHTML = html;
-            }
+            });
+            document.getElementById('themeColors').innerHTML = html;
         }
     }
 
-    // ======= اسکنر QR =======
-    let lastScannedText = '';
-
+    // ============ اسکنر QR ============
     function startScanning() {
-        if (BaleApp.showScanQrPopup) {
-            BaleApp.showScanQrPopup({
-                text: 'کد QR را اسکن کنید'
-            });
-            showToast('اسکنر فعال شد. دوربین را به سمت QR بگیرید 📷');
+        if (BaleApp && BaleApp.showScanQrPopup) {
+            BaleApp.showScanQrPopup({ text: 'کد QR را اسکن کنید' });
+            showToast('📷 اسکنر فعال شد');
         } else {
             showToast('❌ دستگاه شما از اسکنر پشتیبانی نمی‌کند');
         }
     }
 
-    // گوش دادن به نتیجه اسکن
-    if (BaleApp) {
-        BaleApp.onEvent('qrTextReceived', function(data) {
-            lastScannedText = data.text;
-
-            // نمایش نتیجه
-            document.getElementById('scanResult').style.display = 'block';
-            document.getElementById('scanText').textContent = data.text;
-
-            // اضافه به تاریخچه
-            addToScanHistory(data.text);
-
-            showToast('✅ اسکن با موفقیت انجام شد');
-        });
-
-        BaleApp.onEvent('scanQrPopupClosed', function() {
-            showToast('اسکنر بسته شد');
-        });
-    }
-
     function addToScanHistory(text) {
         const historyDiv = document.getElementById('scanHistory');
+        if (historyDiv.querySelector('.text-muted')) historyDiv.innerHTML = '';
+
         const time = new Date().toLocaleTimeString('fa-IR');
-
-        const historyItem = `
-        <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
-            <small class="text-truncate" style="max-width: 200px;">${text}</small>
-            <small class="text-muted">${time}</small>
-        </div>
-    `;
-
-        if (historyDiv.querySelector('.text-muted')) {
-            historyDiv.innerHTML = '';
-        }
-
-        historyDiv.insertAdjacentHTML('afterbegin', historyItem);
+        historyDiv.insertAdjacentHTML('afterbegin', `
+                <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                    <small class="text-truncate" style="max-width:200px;">${text}</small>
+                    <small class="text-muted">${time}</small>
+                </div>`);
     }
 
     function copyScanResult() {
-        navigator.clipboard.writeText(lastScannedText).then(() => {
-            showToast('📋 متن کپی شد');
-        });
+        navigator.clipboard.writeText(lastScannedText).then(() => showToast('📋 متن کپی شد'));
     }
 
     function openScannedLink() {
         if (lastScannedText.startsWith('http')) {
-            if (BaleApp.openLink) {
+            if (BaleApp && BaleApp.openLink) {
                 BaleApp.openLink(lastScannedText);
             } else {
                 window.open(lastScannedText, '_blank');
@@ -672,29 +581,31 @@
         }
     }
 
-    // ======= توابع کمکی =======
+    // ============ توابع کمکی ============
     function showToast(message) {
-        // ایجاد toast با بوت‌استرپ
-        const toastHTML = `
-        <div class="position-fixed bottom-0 start-50 translate-middle-x p-3" style="z-index: 9999">
-            <div class="toast align-items-center text-bg-primary border-0" role="alert">
-                <div class="d-flex">
-                    <div class="toast-body">${message}</div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>
-        </div>
-    `;
+        const container = document.getElementById('toastContainer');
+        const id = 'toast_' + Date.now();
+        container.insertAdjacentHTML('beforeend', `
+                <div id="${id}" class="toast align-items-center text-bg-primary border-0 mb-2" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>`);
 
-        document.body.insertAdjacentHTML('beforeend', toastHTML);
-        const toastElement = document.querySelector('.toast:last-child');
-        const toast = new bootstrap.Toast(toastElement, { delay: 2000 });
+        const toastEl = document.getElementById(id);
+        const toast = new bootstrap.Toast(toastEl, { delay: 2000 });
         toast.show();
+        toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+    }
 
-        // پاکسازی بعد از بسته شدن
-        toastElement.addEventListener('hidden.bs.toast', () => {
-            toastElement.parentElement.remove();
-        });
+    function showError(message) {
+        document.getElementById('loadingScreen').innerHTML = `
+                <div class="text-center text-danger">
+                    <span style="font-size:3rem;">⚠️</span>
+                    <h5 class="mt-3">خطا</h5>
+                    <p>${message}</p>
+                </div>`;
     }
 </script>
 </body>
