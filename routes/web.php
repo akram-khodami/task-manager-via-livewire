@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\V1\MiniAppController;
 use App\Livewire\Auth\LoginForm;
 use App\Livewire\Auth\RegisterForm;
 use App\Livewire\Dashboard;
@@ -36,3 +37,7 @@ Route::get('/set-locale/{locale}', function ($locale) {
     }
     return redirect()->back();
 })->name('set-locale');
+
+//test mini app
+Route::get('/miniapp', [MiniAppController::class, 'index'])->name('miniapp.home');
+Route::post('/api/miniapp/validate', [MiniAppController::class, 'validate'])->name('miniapp.validate');
